@@ -1,15 +1,13 @@
-<div class="container">
+<div class="container" id="main-container">
   <div class="row">
-
     <div class="col-12 mb-3 mb-lg-5">
       <div class="overflow-hidden card table-nowrap table-card">
-        <div class="card-header d-flex justify-content-between">
-          <!-- <a class="nav-link" (click)="onOpenModal(null, 'add')"><i class="fa fa-plus-circle fa-5"></i><span -->
-              <!-- class="sr-only">(current)</span></a> -->
-
-          <form class="form-inline my-2 my-lg-0">
-            <input type="search" (ngModelChange)="searchMonsters(key.value)" #key="ngModel" ngModel name="key"
-              id="searchName" class="form-control mr-sm-2" placeholder="Search monsters..." required>
+        <div class="card-header d-flex justify-content-between">     
+           <form class="form-inline my-2 my-lg-0"> 
+            <input type="text" name="serch" [(ngModel)]="searchText"
+            (input)="searchMonsters()" placeholder="Search..." >           
+            <button type="button" (click)="getMonsters()" id="get-monsters" class="btn btn-primary" >Sync</button>
+            <button type="button"  (click)="onOpenAddModal()"  class="btn btn-primary">+</button>
           </form>
 
         </div>
@@ -25,7 +23,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let monster of monsters" class="align-middle">
+              <tr *ngFor="let monster of shownMonsters" class="align-middle">
                 <td>
                   <div class="d-flex align-items-center">
                     <img src="{{monster?.imageUrl}}" class="avatar sm rounded-pill me-3 flex-shrink-0" alt="Image">
@@ -37,28 +35,27 @@
                 <td>{{monster?.size}}</td>
                 <td>{{monster?.lang}}</td>
                 <td>{{monster?.owned}}</td>
-                <td class="text-end">
-                  <div class="float-right btn-group btn-group-sm">
+                <td>
+                  <button type=button class="btn btn-primary" (click)="deleteMonster(monster)">X</button>
+                  <button type=button class="btn btn-primary" (click)="onOpenEditMonster(monster)">EDIT</button>
+
+                  <!-- <div class="float-right btn-group btn-group-sm">
                     <a (click)="onOpenModal(monster, 'edit')" class="btn btn-primary tooltips" data-placement="top"
-                      data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
-                    <a (click)="onOpenModal(monster, 'delete')" class="btn btn-secondary tooltips" data-placement="top"
-                      data-original-title="Delete"><i class="fa fa-times"></i></a>
-                  </div>
-                </td>
+                      data-original-title="Edit"><i class="fa fa-pencil"></i></div> </a>-->
+                    
+                  
+                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  </div>
-</div>
-
-
-
+  </div> 
+</div> 
 
 <!-- Add Monster Modal -->
-<div class="modal fade" id="addMonsterModal" tabindex="-1" role="dialog" aria-labelledby="addMonsterModalLabel"
+<div class="modal" id="addMonsterModal" tabindex="-1" role="dialog" aria-labelledby="addMonsterModalLabel"
   aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -96,6 +93,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Edit Modal -->
 <!-- <div class="modal fade" id="updateMonsterModal" tabindex="-1" role="dialog" aria-labelledby="monsterEditModalLabel"
@@ -172,9 +170,12 @@
 
 
 <!-- Notification for no monsters -->
-<div *ngIf="monsters?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
+<!-- <div *ngIf="monsters?.length == 0" class="col-lg-12 col-md-12 col-xl-12">
   <div class="alert alert-info" role="alert">
     <h4 class="alert-heading">NO EMPLOYEES!</h4>
     <p>No Monsters were found.</p>
   </div>
-</div>
+</div> 
+
+</body>
+</html> -->

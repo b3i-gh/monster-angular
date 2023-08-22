@@ -11,17 +11,17 @@ export class MonsterService {
 
   constructor(private http: HttpClient) { }
 
-    public getMonsters(): Observable<any> {
-      return this.http.get<any>(`${this.apiServerUrl}${this.apiVersionUrl}/all`);
+    public getMonsters(): Observable<Monster[]> {
+      return this.http.get<Monster[]>(`${this.apiServerUrl}${this.apiVersionUrl}/all`);
     }
 
     public addMonster(monster: Monster): Observable<Monster> {
       return this.http.post<Monster>(`${this.apiServerUrl}${this.apiVersionUrl}/add`, monster);
   }
 
-  public updateMonster(monster: Monster): Observable<Monster> {
-      return this.http.put<Monster>(`${this.apiServerUrl}${this.apiVersionUrl}/update`, monster);
-  }
+  // public updateMonster(monster: Monster): Observable<Monster> {
+  //     return this.http.put<Monster>(`${this.apiServerUrl}${this.apiVersionUrl}/update`, monster);
+  // }
 
   public deleteMonster(monsterId: number): Observable<void> {
       return this.http.delete<void>(`${this.apiServerUrl}${this.apiVersionUrl}/delete/${monsterId}`);

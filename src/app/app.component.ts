@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Monster } from './monster';
 import { MonsterService } from './monster.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -10,9 +10,10 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  public monsters: Monster[] | undefined;
-  public editMonster: Monster | undefined;
-  public deleteMonster: Monster | undefined;
+  public allMonsters: Monster[] | undefined;
+  public shownMonsters: Monster[] = [];
+  // public editMonster: Monster | undefined;
+  // public deleteMonster: Monster | undefined;
   
   constructor (private monsterService: MonsterService){}
 
@@ -21,95 +22,147 @@ export class AppComponent implements OnInit {
   }
 
   public getMonsters(): void{
+    this.resetSearchFilter();
     this.monsterService.getMonsters().subscribe(
       (response: Monster[]) => {
-        this.monsters = response;
+        this.shownMonsters = this.allMonsters = response;
       },
       (error: HttpErrorResponse) => {
         alert(error.message);
       }
     )
   }
-
-  public onAddMonster(addForm: NgForm): void {
-    let addButton = document.getElementById('add-monster-form');
-    if(addButton != null)
-      addButton.click();
-    this.monsterService.addMonster(addForm.value).subscribe(
-      (response: Monster) => {
-        console.log(response);
-        this.getMonsters();
-        addForm.reset();
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-        addForm.reset();
-      }
-    );
+ 
+  public resetSearchFilter(): void{
+    this.searchText = '';
+    this.searchMonsters();
+    console.log("reset");
   }
 
-  public onUpdateMonster(monster: Monster): void {
-    this.monsterService.updateMonster(monster).subscribe(
-      (response: Monster) => {
-        console.log(response);
-        this.getMonsters();
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
+  /* Enables the filtering in the table */
+  searchText = '';
+  @Output()
+  searchTextChanged : EventEmitter<string> = new EventEmitter<string>();  
+  
+  public searchMonsters(): void {
+    this.searchTextChanged.emit();
+    const matchingMonsters: Monster[] = [];
+    if(this.allMonsters != undefined){    
+
+    for(const m of this.allMonsters){
+      if (m.name.toLowerCase().indexOf(this.searchText.toLowerCase()) !== -1)
+      matchingMonsters.push(m);
+    }
+      this.shownMonsters = matchingMonsters;    
+   }
   }
 
-  public onDeleteMonster(monsterId: number): void {
-    this.monsterService.deleteMonster(monsterId).subscribe(
-      (response: void) => {
-        console.log(response);
-        this.getMonsters();
-      },
-      (error: HttpErrorResponse) => {
-        alert(error.message);
-      }
-    );
-  }
 
-  public searchMonsters(key: string): void {
-    console.log(key);
-    const results: Monster[] = [];
-    if(this.monsters != undefined){
-      for (const monster of this.monsters) {
-        if (monster.name.toLowerCase().indexOf(key.toLowerCase()) !== -1)
-         {
-          results.push(monster);
+  deleteMonster(monster: Monster) {
+    if(confirm("Are you sure to delete this monster: "+monster.name)) {
+      this.monsterService.deleteMonster(monster.id).subscribe(
+        (response: void) => {
+          console.log(response);
+          this.getMonsters();
+          console.log("monster "+monster.id+" deleted");
+        },
+        (error: HttpErrorResponse) => {
+          alert(error.message);
         }
-      }
-    }
-    this.monsters = results;
-    if (results.length === 0 || !key) {
-      this.getMonsters();
+        );
     }
   }
 
-  public onOpenModal(monster: Monster, mode: string): void {
+  public onOpenAddModal(): void{
     const container = document.getElementById('main-container');
     const button = document.createElement('button');
+    
     button.type = 'button';
     button.style.display = 'none';
     button.setAttribute('data-toggle', 'modal');
-    if (mode === 'add') {
-      button.setAttribute('data-target', '#addMonsterModal');
-    }
-    if (mode === 'edit') {
-      this.editMonster = monster;
-      button.setAttribute('data-target', '#updateMonsterModal');
-    }
-    if (mode === 'delete') {
-      this.deleteMonster = monster;
-      button.setAttribute('data-target', '#deleteMonsterModal');
-    }
+    button.setAttribute('data-target', '#addMonsterModal');
+    
     if(container != null)
       container.appendChild(button);
     button.click();
   }
+
+  public onAddMonster(addForm: NgForm): void {
+  //   let addButton = document.getElementById('add-monster-form');
+  //   if(addButton != null)
+  //     addButton.click();
+  //   this.monsterService.addMonster(addForm.value).subscribe(
+  //     (response: Monster) => {
+  //       console.log(response);
+  //       this.getMonsters();
+  //       addForm.reset();
+  //     },
+  //     (error: HttpErrorResponse) => {
+  //       alert(error.message);
+  //       addForm.reset();
+  //     }
+  //   );
+  }
+
+  public onOpenEditMonster(monster: Monster): void{
+    // const container = document.getElementById('main-container');
+    // const button = document.createElement('button');
+    // button.type = 'button';
+    // button.style.display = 'none';
+    // button.setAttribute('data-toggle', 'modal');
+    // button.setAttribute('data-target', '#addMonsterModal');
+    
+    // if(container != null)
+    //   container.appendChild(button);
+    // button.click(); 
+  }
+  
+      
+
+    
+
+  
+   
+
+
+  
+
+  // public onUpdateMonster(monster: Monster): void {
+  //   this.monsterService.updateMonster(monster).subscribe(
+  //     (response: Monster) => {
+  //       console.log(response);
+  //       this.getMonsters();
+  //     },
+  //     (error: HttpErrorResponse) => {
+  //       alert(error.message);
+  //     }
+  //   );
+  // }
+
+  
+  
+
+  // public onOpenModal(monster: Monster, mode: string): void {
+  //   const container = document.getElementById('main-container');
+  //   const button = document.createElement('button');
+  //   button.type = 'button';
+  //   button.style.display = 'none';
+  //   button.setAttribute('data-toggle', 'modal');
+  //   if (mode === 'add') {
+  //     button.setAttribute('data-target', '#addMonsterModal');
+  //   }
+  //   if (mode === 'edit') {
+  //     this.editMonster = monster;
+  //     button.setAttribute('data-target', '#updateMonsterModal');
+  //   }
+  //   if (mode === 'delete') {
+  //     this.deleteMonster = monster;
+  //     button.setAttribute('data-target', '#deleteMonsterModal');
+  //   }
+  //   if(container != null)
+  //     container.appendChild(button);
+  //   button.click();
+  // }
 
 
 
